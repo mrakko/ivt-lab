@@ -83,6 +83,7 @@ public class GT4500 implements SpaceShip {
           wasPrimaryFiredLast = true;
         }
         // lets try out the merging
+        // B always batter than A
         break;
     }
 
