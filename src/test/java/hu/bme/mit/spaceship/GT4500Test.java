@@ -26,10 +26,10 @@ public class GT4500Test {
     when(mockTSp.isEmpty()).thenReturn(false);
 
     // Act
-    ship.fireTorpedo(FiringMode.SINGLE);
+    boolean result = ship.fireTorpedo(FiringMode.SINGLE);
 
     // Assert
-    //assertEquals(true, result);
+    assertEquals(true, result);
     verify(mockTSp, times(1)).fire(1);
     verify(mockTSp, times(1)).isEmpty();
   }
@@ -42,14 +42,87 @@ public class GT4500Test {
     when(mockTSp.isEmpty()).thenReturn(false);
     when(mockTSs.isEmpty()).thenReturn(false);
 
-    ship.fireTorpedo(FiringMode.ALL);
+    boolean result = ship.fireTorpedo(FiringMode.ALL);
 
     // Assert
-    //assertEquals(true, result);
+    assertEquals(true, result);
     verify(mockTSp, times(1)).fire(1);
     verify(mockTSs, times(1)).fire(1);
     verify(mockTSp, times(1)).isEmpty();
     verify(mockTSs, times(1)).isEmpty();
+  }
+
+  @Test
+  public void fireTorpedo_Single_fires_one_store(){
+    ship.fireTorpedo(FiringMode.SINGLE);
+
+    // Assert
+    verify(mockTSp, times(1)).fire(1);
+    verify(mockTSs, times(0)).fire(1);
+  }
+
+  @Test
+  public void fireTorpedo_Primary_empty_fires_secondary(){
+    when(mockTSp.isEmpty()).thenReturn(true);
+    
+    ship.fireTorpedo(FiringMode.SINGLE);
+
+    // Assert
+    verify(mockTSp, times(0)).fire(1);
+    verify(mockTSs, times(1)).fire(1);
+    verify(mockTSp, times(1)).isEmpty();
+  }
+
+  @Test
+  public void fireTorpedo_Is_alternating(){
+    
+    for (int i = 0; i < 4; i++) {
+      ship.fireTorpedo(FiringMode.SINGLE);
+    }
+
+    // Assert
+    verify(mockTSp, times(2)).fire(1);
+    verify(mockTSs, times(2)).fire(1);
+  }
+
+  @Test
+  public void fireTorpedo_Primary_twice_on_secondary_empty(){
+    when(mockTSs.isEmpty()).thenReturn(true);
+
+    for (int i = 0; i < 2; i++) {
+      ship.fireTorpedo(FiringMode.SINGLE);
+    }
+
+    // Assert
+    verify(mockTSp, times(2)).fire(1);
+    verify(mockTSs, times(0)).fire(1);
+    verify(mockTSs, times(1)).isEmpty();
+  }
+
+
+  @Test
+  public void fireTorpedo_Both_empty(){
+    when(mockTSp.isEmpty()).thenReturn(true);
+    when(mockTSs.isEmpty()).thenReturn(true);
+    
+    boolean result = ship.fireTorpedo(FiringMode.SINGLE);
+
+    // Assert
+    assertEquals(false, result);
+    verify(mockTSp, times(1)).isEmpty();
+    verify(mockTSs, times(1)).isEmpty();
+  }
+
+
+  // Plan based on solely code
+  @Test
+  public void fireTorpedo_All_fails_when_one_store_is_empty(){
+    when(mockTSp.isEmpty()).thenReturn(true);
+
+    boolean result = ship.fireTorpedo(FiringMode.ALL);
+
+    // Assert
+    assertEquals(false, result);
   }
 
 }
